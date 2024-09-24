@@ -4,7 +4,12 @@ import { nxE2EPreset } from '@nx/playwright/preset';
 import { workspaceRoot } from '@nx/devkit';
 
 // For CI, you may want to set BASE_URL to the deployed application.
-const baseURL = process.env['NX_BASE_URL'] || 'http://localhost:4200';
+let baseURL = process.env.BASE_URL;
+if (!baseURL && process.env.CI) {
+  baseURL = 'https://ahsanyaz.github.io/ng-gc-ws';
+} else {
+  baseURL = 'http://localhost:4200';
+}
 console.log({ env: process.env });
 console.log({ baseURL });
 /**
