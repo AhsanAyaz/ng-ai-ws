@@ -5,7 +5,8 @@ import { workspaceRoot } from '@nx/devkit';
 
 // For CI, you may want to set BASE_URL to the deployed application.
 const baseURL = process.env['BASE_URL'] || 'http://localhost:4200';
-
+console.log({ env: process.env });
+console.log({ baseURL });
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv

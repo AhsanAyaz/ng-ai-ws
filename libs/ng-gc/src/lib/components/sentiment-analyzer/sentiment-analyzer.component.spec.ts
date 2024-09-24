@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SentimentAnalyzerComponent } from './sentiment-analyzer.component';
+import { GeminiService } from '../../services/gemini.service';
 
 describe('SentimentAnalyzerComponent', () => {
   let component: SentimentAnalyzerComponent;
@@ -8,6 +9,12 @@ describe('SentimentAnalyzerComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [SentimentAnalyzerComponent],
+      providers: [
+        {
+          provide: GeminiService,
+          useClass: class GeminiServiceMock {},
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SentimentAnalyzerComponent);

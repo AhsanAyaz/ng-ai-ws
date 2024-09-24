@@ -15,15 +15,15 @@ permissions:
 jobs:
   main:
     runs-on: ubuntu-latest
+
     steps:
-      env:
-        BASE_URL: https://AhsanAyaz.github.io/ng-gc-ws/
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e-ci"
-
+        env:
+          BASE_URL: https://ahsanyaz.github.io/ng-gc-ws/
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -33,6 +33,8 @@ jobs:
       - uses: nrwl/nx-set-shas@v4
 
       - run: npx nx affected -t lint test build e2e-ci
+        env:
+          BASE_URL: https://ahsanyaz.github.io/ng-gc-ws/
 
   deploy:
     needs: main
