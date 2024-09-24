@@ -21,7 +21,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e-ci"
+      - run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -30,7 +30,7 @@ jobs:
       - run: npm ci --legacy-peer-deps
       - uses: nrwl/nx-set-shas@v4
 
-      - run: npx nx affected -t lint test build e2e-ci --parallel=1
+      - run: npx nx affected -t lint test build --parallel=1
 
   deploy:
     needs: main
@@ -62,3 +62,23 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+  
+  e2e:
+    needs: [deploy]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e-ci"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - run: npm ci --legacy-peer-deps
+      - uses: nrwl/nx-set-shas@v4
+
+      - run: npx nx affected -t e2e-ci --parallel=1
