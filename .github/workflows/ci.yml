@@ -16,6 +16,8 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
+      env:
+        BASE_URL: https://AhsanAyaz.github.io/ng-gc-ws/
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
