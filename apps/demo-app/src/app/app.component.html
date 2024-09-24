@@ -1,0 +1,26 @@
+<header>
+  <nav class="navbar bg-base-100">
+    <a class="btn btn-ghost text-xl">
+      Angular Gemini Demo App
+    </a>
+  </nav>
+</header>
+<main class="mx-auto max-w-3xl p-8">
+  <form [formGroup]="form" class="form relative grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <select name="model" formControlName="model" class="select select-bordered w-full max-w-xs">
+        <option disabled>Select a Gemini model</option>
+        @for(model of models; track model.name) {
+          <option value="{{model.name}}">{{model.title}}</option>
+        }
+      </select>
+    </div>
+    <div class="flex flex-col gap-4 items-end">
+      <textarea formControlName="inputTextVal" class="textarea w-full border-2 border-base-content"
+        placeholder="Type something to analyze the sentiment"
+        rows="3"></textarea>
+      <ng-gc-sentiment-analyzer [config]="sentimentConfig()" [text]="inputTextValDebounced()"></ng-gc-sentiment-analyzer> 
+    </div>
+  </form>
+</main>
+<router-outlet></router-outlet>

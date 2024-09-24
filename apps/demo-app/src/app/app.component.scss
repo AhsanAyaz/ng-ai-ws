@@ -1,0 +1,10 @@
+ng-gc-sentiment-analyzer {
+  @apply badge;
+}
+ng-gc-sentiment-analyzer[data-sentiment="positive"] {
+  @apply badge-success;
+}
+
+ng-gc-sentiment-analyzer[data-sentiment="negative"] {
+  @apply badge-error;
+}
