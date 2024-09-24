@@ -30,7 +30,7 @@ jobs:
       - run: npm ci --legacy-peer-deps
       - uses: nrwl/nx-set-shas@v4
 
-      - run: npx nx affected -t lint test build --parallel=1
+      - run: npx nx affected -t lint test build
 
   deploy:
     needs: main
@@ -72,7 +72,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e-ci"
+      - run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="demo-app-e2e:e2e-ci"
       - uses: actions/setup-node@v4
         with:
           node-version: 20

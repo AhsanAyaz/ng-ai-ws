@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import {
+  NGGC_API_CONFIG,
   NgGCSupportedModels,
   SentimentAnalyzerComponent,
 } from '@codewithahsan/ng-gc';
@@ -16,6 +17,7 @@ import { debounceTime, map } from 'rxjs';
 })
 export class AppComponent {
   fb = inject(FormBuilder);
+  config = inject(NGGC_API_CONFIG);
   form = this.fb.nonNullable.group({
     inputTextVal: ['', Validators.required],
     model: [NgGCSupportedModels[1].name, Validators.required],
@@ -39,4 +41,8 @@ export class AppComponent {
       initialValue: '',
     }
   );
+
+  reloadApp() {
+    window.location.reload();
+  }
 }

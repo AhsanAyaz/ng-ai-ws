@@ -14,10 +14,6 @@ export const appConfig: ApplicationConfig = {
           const apiKey = prompt(
             "There's no API key in the environment. Please enter your Gemini API Key for the demo. And don't worry, we don't store it anywhere, and the code is public on GitHub :)"
           );
-          if (!apiKey) {
-            window.location.reload();
-            return false;
-          }
           return {
             model: NgGCSupportedModels[1].name,
             apiKey,

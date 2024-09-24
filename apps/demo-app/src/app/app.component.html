@@ -8,21 +8,39 @@
 </header>
 <main class="mx-auto max-w-3xl p-8">
   <h2 class="text-xl mb-4 text-center">Angular Gemini Sentiment Analyzer</h2>
-  <form [formGroup]="form" class="form relative grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-      <select name="model" formControlName="model" class="select select-bordered w-full max-w-xs">
-        <option disabled>Select a Gemini model</option>
-        @for(model of models; track model.name) {
-          <option value="{{model.name}}">{{model.title}}</option>
-        }
-      </select>
+  @if(config.apiKey) {
+    <form [formGroup]="form" class="form relative grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <select name="model" formControlName="model" class="select select-bordered w-full max-w-xs">
+          <option disabled>Select a Gemini model</option>
+          @for(model of models; track model.name) {
+            <option value="{{model.name}}">{{model.title}}</option>
+          }
+        </select>
+      </div>
+      <div class="flex flex-col gap-4 items-end">
+        <textarea formControlName="inputTextVal" class="textarea w-full border-2 border-base-content"
+          placeholder="Type something to analyze the sentiment of the text"
+          rows="3"></textarea>
+        <ng-gc-sentiment-analyzer [config]="sentimentConfig()" [text]="inputTextValDebounced()"></ng-gc-sentiment-analyzer> 
+      </div>
+    </form> 
+  } @else {
+    <div role="alert" class="alert alert-error">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="stroke-error-content h-6 w-6 shrink-0">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <span>Please reload the page and provide the Gemini API key</span>
+      <button (click)="reloadApp()" class="btn btn-sm">Reload</button>
     </div>
-    <div class="flex flex-col gap-4 items-end">
-      <textarea formControlName="inputTextVal" class="textarea w-full border-2 border-base-content"
-        placeholder="Type something to analyze the sentiment of the text"
-        rows="3"></textarea>
-      <ng-gc-sentiment-analyzer [config]="sentimentConfig()" [text]="inputTextValDebounced()"></ng-gc-sentiment-analyzer> 
-    </div>
-  </form>
+  }
 </main>
 <router-outlet></router-outlet>
