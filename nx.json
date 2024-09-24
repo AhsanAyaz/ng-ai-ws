@@ -16,7 +16,7 @@
   },
   "nxCloudId": "66f091babb580d02cfb7153e",
   "targetDefaults": {
-    "@angular-devkit/build-angular:application": {
+    "@nx/angular:browser-esbuild": {
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
