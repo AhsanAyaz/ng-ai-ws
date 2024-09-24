@@ -34,6 +34,7 @@ module.exports = [
         'error',
         { ignoredFiles: ['{projectRoot}/eslint.config.{js,cjs,mjs}'] },
       ],
+      '@typescript-eslint/no-unused-expressions': ['off'],
     },
     languageOptions: { parser: require('jsonc-eslint-parser') },
   },

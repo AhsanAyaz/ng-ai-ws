@@ -2,11 +2,18 @@ import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { NxWelcomeComponent } from './nx-welcome.component';
 import { RouterModule } from '@angular/router';
+import { GeminiService } from '@codewithahsan/ng-gc';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent, NxWelcomeComponent, RouterModule.forRoot([])],
+      providers: [
+        {
+          provide: GeminiService,
+          useClass: class GeminiServiceMock {},
+        },
+      ],
     }).compileComponents();
   });
 
@@ -14,14 +21,8 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain(
-      'Welcome demo-app'
+    expect(compiled.querySelector('header nav')?.textContent).toContain(
+      'Angular Gemini Demo App'
     );
-  });
-
-  it(`should have as title 'demo-app'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('demo-app');
   });
 });
