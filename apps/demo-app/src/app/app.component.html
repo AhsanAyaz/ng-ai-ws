@@ -1,11 +1,13 @@
 <header>
-  <nav class="navbar bg-base-100">
+  <nav class="navbar bg-base-100 flex items-center justify-between">
     <a class="btn btn-ghost text-xl">
       Angular Gemini Demo App
     </a>
+    <a class="px-4" target="_blank" rel="noreferrer noopener" href="https://github.com/AhsanAyaz/ng-gc-ws"><img src="/assets/github-mark-white.svg" class="w-4 h-4" alt="github logo" /></a>
   </nav>
 </header>
 <main class="mx-auto max-w-3xl p-8">
+  <h2 class="text-xl mb-4 text-center">Angular Gemini Sentiment Analyzer</h2>
   <form [formGroup]="form" class="form relative grid grid-cols-1 md:grid-cols-2 gap-4">
     <div>
       <select name="model" formControlName="model" class="select select-bordered w-full max-w-xs">
@@ -17,7 +19,7 @@
     </div>
     <div class="flex flex-col gap-4 items-end">
       <textarea formControlName="inputTextVal" class="textarea w-full border-2 border-base-content"
-        placeholder="Type something to analyze the sentiment"
+        placeholder="Type something to analyze the sentiment of the text"
         rows="3"></textarea>
       <ng-gc-sentiment-analyzer [config]="sentimentConfig()" [text]="inputTextValDebounced()"></ng-gc-sentiment-analyzer> 
     </div>

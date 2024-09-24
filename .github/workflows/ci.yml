@@ -81,4 +81,4 @@ jobs:
       - run: npm ci --legacy-peer-deps
       - uses: nrwl/nx-set-shas@v4
 
-      - run: npx nx affected -t e2e-ci --parallel=1
+      - run: npx nx affected -t e2e-ci
