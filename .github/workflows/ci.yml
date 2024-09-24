@@ -13,6 +13,7 @@ permissions:
   id-token: write
 
 jobs:
+  # Main CI job for lint, test, and build
   main:
     runs-on: ubuntu-latest
 
@@ -32,6 +33,7 @@ jobs:
 
       - run: npx nx affected -t lint test build
 
+  # Deploy job to build and deploy to GitHub Pages
   deploy:
     needs: main
     runs-on: ubuntu-latest
@@ -48,23 +50,24 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: Build
+      - name: Build the app
         run: npx nx build demo-app --baseHref "/ng-gc-ws/"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Upload artifact
+      - name: Upload artifact to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist/apps/demo-app'  # Adjust this path to match your build output directory
+          path: './dist/apps/demo-app'
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-  
+
+  # e2e job to run tests against deployed app
   e2e:
-    needs: [deploy]
+    needs: [deploy]  # Ensures this job runs only after deployment is successful
     runs-on: ubuntu-latest
 
     steps:
@@ -72,13 +75,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="demo-app-e2e:e2e-ci"
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
 
-      - run: npm ci --legacy-peer-deps
-      - uses: nrwl/nx-set-shas@v4
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps && npx playwright install
 
-      - run: npx nx run demo-app-e2e:e2e-ci
+      - name: Run e2e tests against deployed app
+        run: CI=true && npx nx e2e demo-app-e2e
