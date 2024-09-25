@@ -6,7 +6,7 @@ import { workspaceRoot } from '@nx/devkit';
 // For CI, you may want to set BASE_URL to the deployed application.
 let baseURL = process.env.BASE_URL;
 if (!baseURL && process.env.CI) {
-  baseURL = 'https://ahsanyaz.github.io/ng-gc-ws';
+  baseURL = 'https://ahsanayaz.github.io/ng-gc-ws';
 } else {
   baseURL = 'http://localhost:4200';
 }

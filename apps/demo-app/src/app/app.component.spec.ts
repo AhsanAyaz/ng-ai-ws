@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { NxWelcomeComponent } from './nx-welcome.component';
 import { RouterModule } from '@angular/router';
-import { GeminiService, NGGC_API_CONFIG } from '@codewithahsan/ng-gc';
+import { GeminiService } from '@codewithahsan/ng-gc';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -11,13 +11,11 @@ describe('AppComponent', () => {
       providers: [
         {
           provide: GeminiService,
-          useClass: class GeminiServiceMock {},
-        },
-        {
-          provide: NGGC_API_CONFIG,
-          useValue: {
-            model: '',
-            apiKey: '',
+          useClass: class GeminiServiceMock {
+            geminiApiConfig = {
+              model: '',
+              apiKey: '',
+            };
           },
         },
       ],

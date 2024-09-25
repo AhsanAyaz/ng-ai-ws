@@ -9,20 +9,9 @@ export const appConfig: ApplicationConfig = {
     provideRouter(appRoutes),
     {
       provide: NGGC_API_CONFIG,
-      useFactory: () => {
-        if (!process.env.NG_GC_GEMINI_API_KEY) {
-          const apiKey = prompt(
-            "There's no API key in the environment. Please enter your Gemini API Key for the demo. And don't worry, we don't store it anywhere, and the code is public on GitHub :)"
-          );
-          return {
-            model: NgGCSupportedModels[1].name,
-            apiKey,
-          };
-        }
-        return {
-          model: NgGCSupportedModels[1].name,
-          apiKey: process.env.NG_GC_GEMINI_API_KEY,
-        };
+      useValue: {
+        model: NgGCSupportedModels[1].name,
+        apiKey: process.env.NG_GC_GEMINI_API_KEY,
       },
     },
   ],
