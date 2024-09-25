@@ -1,88 +1,75 @@
 name: CI and Deploy
-
 on:
   push:
     branches:
       - main
   pull_request:
-
 permissions:
   actions: read
   contents: read
   pages: write
   id-token: write
-
 jobs:
   # Main CI job for lint, test, and build
   main:
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
-
       - run: npm ci --legacy-peer-deps
       - uses: nrwl/nx-set-shas@v4
-
       - run: npx nx affected -t lint test build
-
   # Deploy job to build and deploy to GitHub Pages
   deploy:
     needs: main
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     if: github.ref == 'refs/heads/main'
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
-
       - name: Build the app
         run: npx nx build demo-app --baseHref "/ng-gc-ws/"
-
       - name: Setup Pages
         uses: actions/configure-pages@v4
-
       - name: Upload artifact to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: './dist/apps/demo-app'
-
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
   # e2e job to run tests against deployed app
   e2e:
     needs: [deploy]  # Ensures this job runs only after deployment is successful
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
-
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps && npx playwright install
-
+        run: npm ci --legacy-peer-deps
+      - name: Install Playwright browsers and dependencies
+        run: npx playwright install --with-deps
+      - name: Install additional WebKit dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwoff1 libopus0 libwebp6 libwebpdemux2 libenchant1c2a libgudev-1.0-0 libsecret-1-0 libhyphen0 libgdk-pixbuf2.0-0 libegl1 libnotify4 libxslt1.1 libevent-2.1-7 libgles2 libvpx6 libxcomposite1 libatk1.0-0 libatk-bridge2.0-0 libepoxy0 libgtk-3-0 libharfbuzz-icu0
+          sudo apt-get install -y libgstreamer-gl1.0-0 libgstreamer-plugins-bad1.0-0 gstreamer1.0-plugins-good gstreamer1.0-libav
       - name: Run e2e tests against deployed app
         run: CI=true && npx nx e2e demo-app-e2e
