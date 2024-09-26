@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { NGGC_API_CONFIG } from '../tokens/gemini-api-config';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { NGGCSentimentAnalaysisConfig, NGGCSentimentResponse } from '../types';
+import { NGGCSentimentAnalaysisConfig, NGGCSentiment } from '../types';
 
 @Injectable({
   providedIn: 'root',
@@ -48,6 +48,6 @@ export class GeminiService {
       ${text}
     `;
     const result = await model.generateContent([prompt]);
-    return JSON.parse(result.response.text()) as NGGCSentimentResponse;
+    return JSON.parse(result.response.text()) as NGGCSentiment;
   }
 }

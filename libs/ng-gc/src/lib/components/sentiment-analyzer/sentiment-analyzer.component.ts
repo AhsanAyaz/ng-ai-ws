@@ -8,10 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GeminiService } from '../../services/gemini.service';
-import {
-  NGGCSentimentAnalaysisConfig,
-  NGGCSentimentResponse,
-} from '../../types';
+import { NGGCSentimentAnalaysisConfig, NGGCSentiment } from '../../types';
 
 @Component({
   selector: 'ng-gc-sentiment-analyzer',
@@ -24,8 +21,9 @@ export class SentimentAnalyzerComponent {
   geminiService = inject(GeminiService);
   text = input.required<string>();
   config = input<NGGCSentimentAnalaysisConfig | null>(null);
-  sentiment = signal<NGGCSentimentResponse | null>(null);
+  sentiment = signal<NGGCSentiment | null>(null);
   loading = signal(false);
+  error = signal<Error | null>(null);
   @HostBinding('attr.data-sentiment')
   get sentimentAttr() {
     if (this.loading()) {
@@ -46,8 +44,18 @@ export class SentimentAnalyzerComponent {
         this.geminiService
           .analyze(this.text(), this.config())
           .then((result) => {
-            console.log(result);
+            if (this.geminiService.geminiApiConfig.debug) {
+              console.log(result);
+            }
             this.sentiment.set(result);
+            this.error.set(null);
+          })
+          .catch((err) => {
+            console.error(err);
+            this.error.set(err);
+            this.sentiment.set(null);
+          })
+          .finally(() => {
             this.loading.set(false);
           });
       },
