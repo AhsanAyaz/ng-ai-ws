@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GeminiService } from '../../services/gemini.service';
-import { NGGCSentimentAnalaysisConfig, NGGCSentiment } from '../../types';
+import { NgGCAiModel, NGGCSentiment } from '../../types';
 
 @Component({
   selector: 'ng-gc-sentiment-analyzer',
@@ -20,7 +20,9 @@ import { NGGCSentimentAnalaysisConfig, NGGCSentiment } from '../../types';
 export class SentimentAnalyzerComponent {
   geminiService = inject(GeminiService);
   text = input.required<string>();
-  config = input<NGGCSentimentAnalaysisConfig | null>(null);
+  model = input<NgGCAiModel | null>(null);
+  hideSentiment = input(false);
+  additionalContext = input('');
   sentiment = signal<NGGCSentiment | null>(null);
   loading = signal(false);
   error = signal<Error | null>(null);
@@ -41,8 +43,9 @@ export class SentimentAnalyzerComponent {
           return;
         }
         this.loading.set(true);
+        this.sentiment.set(null);
         this.geminiService
-          .analyze(this.text(), this.config())
+          .analyze(this.text(), this.model(), this.additionalContext())
           .then((result) => {
             if (this.geminiService.geminiApiConfig.debug) {
               console.log(result);

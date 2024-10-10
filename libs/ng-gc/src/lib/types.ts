@@ -1,22 +1,21 @@
 export type NGGCSentiment = {
   sentiment: string;
-  rating: number;
+  intensity: number;
   emoji: string;
   category: 'positive' | 'negative';
+  reason: string;
+  message: string;
+  suggested_action: 'allow' | 'block';
 };
 
-export type NGGCSentimentAnalaysisConfig = {
-  model?: string;
-};
-
-type AiModel = 'gemini-1.5-pro' | 'gemini-1.5-flash';
+export type NgGCAiModel = 'gemini-1.5-pro' | 'gemini-1.5-flash';
 
 export type NGGCSupportedModel = {
   title: string;
-  name: AiModel;
+  name: NgGCAiModel;
 };
 export type NgGCConfig = {
   apiKey: string;
-  model: AiModel;
+  model: NgGCAiModel;
   debug?: boolean;
 };

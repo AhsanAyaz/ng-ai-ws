@@ -1,5 +1,15 @@
-@if(sentiment() && !loading()) {
-  <p>{{sentiment()?.sentiment}} {{sentiment()?.emoji}}</p>
+@if(sentiment() && !loading() && !hideSentiment()) {
+<div
+  class="sentiment badge"
+  [ngClass]="{
+    'badge-success': sentiment()?.category === 'positive',
+    'badge-error': sentiment()?.category === 'negative'
+  }"
+>
+  <p>{{ sentiment()?.sentiment }} {{ sentiment()?.emoji }}</p>
+</div>
 } @else if (loading()) {
-  <p>...</p>
+<p class="badge">...</p>
+} @else {
+<p class="badge">&nbsp;</p>
 }

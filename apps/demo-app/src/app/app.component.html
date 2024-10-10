@@ -1,59 +1,167 @@
 <header>
   <nav class="navbar bg-base-100 flex items-center justify-between">
     <a class="btn btn-ghost text-xl">
-      Angular Gemini Demo App
+      Sentiment Analyzer with Google Gemini & Angular
     </a>
-    <a class="px-4" target="_blank" rel="noreferrer noopener" href="https://github.com/AhsanAyaz/ng-gc-ws"><img src="assets/github-mark-white.svg" class="w-4 h-4" alt="github logo" /></a>
+    <a
+      class="px-4"
+      target="_blank"
+      rel="noreferrer noopener"
+      href="https://github.com/AhsanAyaz/ng-gc-ws"
+      ><img
+        src="assets/github-mark-white.svg"
+        class="w-4 h-4"
+        alt="github logo"
+    /></a>
   </nav>
 </header>
 <main class="mx-auto max-w-3xl p-8">
-  <h2 class="text-xl mb-4 text-center">Angular Gemini Sentiment Analyzer</h2>
   @if(geminiService.geminiApiConfig.apiKey) {
-    <form [formGroup]="form" class="form relative grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <select name="model" formControlName="model" class="select select-bordered w-full max-w-xs">
-          <option disabled>Select a Gemini model</option>
-          @for(model of models; track model.name) {
-            <option value="{{model.name}}">{{model.title}}</option>
-          }
-        </select>
+  <form
+    [formGroup]="form"
+    class="form relative grid grid-cols-1 md:grid-cols-2 gap-4"
+    (ngSubmit)="postComment()"
+  >
+    <div class="flex flex-col gap-4 w-full max-w-xs mx-auto mb-16 md:mb-0">
+      <select
+        name="model"
+        formControlName="model"
+        class="select select-bordered w-full"
+      >
+        <option disabled>Select a Gemini model</option>
+        @for(model of models; track model.name) {
+        <option value="{{ model.name }}">{{ model.title }}</option>
+        }
+      </select>
+      <div class="form-control w-full">
+        <label class="label cursor-pointer">
+          <span class="label-text">Show Sentiment</span>
+          <input
+            formControlName="showSentiment"
+            type="checkbox"
+            class="toggle"
+          />
+        </label>
+        <small class="text-xs italic px-1"
+          >Shows the emoji and the sentiment</small
+        >
       </div>
-      <div class="flex flex-col gap-4 items-end">
-        <textarea formControlName="inputTextVal" class="textarea w-full border-2 border-base-content"
-          placeholder="Type something to analyze the sentiment of the text"
-          rows="3"></textarea>
-        <ng-gc-sentiment-analyzer [config]="sentimentConfig()" [text]="inputTextValDebounced()"></ng-gc-sentiment-analyzer>
+      <div class="form-control w-full">
+        <label class="label cursor-pointer">
+          <span class="label-text">Show Message</span>
+          <input formControlName="showMessage" type="checkbox" class="toggle" />
+        </label>
+        <small class="text-xs italic px-1"
+          >Shows when sentiment is negative and suggested action is to
+          block</small
+        >
       </div>
-    </form>
+      <label class="label cursor-pointer flex-col flex items-start gap-4">
+        <span class="label-text">Additional Context</span>
+        <textarea
+          formControlName="additionalContext"
+          class="textarea w-full border-2 border-base-content"
+          placeholder="Provide additional context here"
+          rows="3"
+        ></textarea>
+      </label>
+    </div>
+    <div class="flex flex-col gap-4 items-end">
+      <textarea
+        formControlName="inputTextVal"
+        class="textarea w-full border-2 border-base-content"
+        placeholder="Type something to analyze the sentiment of the text"
+        rows="3"
+        (input)="typing.set(true)"
+      ></textarea>
+      <ng-gc-sentiment-analyzer
+        [model]="form.controls.model.value"
+        [text]="inputTextValDebounced()"
+        [hideSentiment]="!form.controls.showSentiment.value"
+        [additionalContext]="form.controls.additionalContext.value"
+      ></ng-gc-sentiment-analyzer>
+      @if(form.controls.showMessage.value &&
+      sentimentComp().sentiment()?.message &&
+      sentimentComp().sentiment()?.suggested_action === 'block') {
+      <small>{{ sentimentComp().sentiment()?.message }}</small>
+      }
+      <button
+        class="btn"
+        type="submit"
+        [disabled]="
+          (form.controls.inputTextVal.value && typing()) ||
+          sentimentComp().loading() ||
+          sentimentComp().sentiment()?.suggested_action === 'block'
+        "
+      >
+        Post Comment
+      </button>
+    </div>
+  </form>
   } @else {
-    <div role="alert" class="alert alert-error">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        class="stroke-error-content h-6 w-6 shrink-0">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-      </svg>
-      <div class="flex flex-col">
-        <div>Please provide the Gemini API Key from the .env file, or from the input below.
-        And don't worry, we don't store it anywhere, and the code is public on GitHub :)</div>
+  <div role="alert" class="alert alert-error">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      class="stroke-error-content h-6 w-6 shrink-0"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      ></path>
+    </svg>
+    <div class="flex flex-col">
+      <div>
+        Please provide the Gemini API Key from the .env file, or from the input
+        below. And don't worry, we don't store it anywhere, and the code is
+        public on GitHub :)
       </div>
     </div>
-    <form (submit)="updateApiKey(apiKeyInput.value, $event)">
-      <label class="form-control w-full">
-        <div class="label">
-          <span class="label-text">Enter your Gemini API Key here</span>
-        </div>
-        <div class="input input-bordered w-full flex items-center gap-2">
-          <input #apiKeyInput type="password" placeholder="Gemini API Key" class="grow" />
-          <span class="badge">Hit enter to apply</span>
-        </div>
-      </label>
-    </form>
+  </div>
+  <form (submit)="updateApiKey(apiKeyInput.value, $event)">
+    <label class="form-control w-full">
+      <div class="label">
+        <span class="label-text">Enter your Gemini API Key here</span>
+      </div>
+      <div class="input input-bordered w-full flex items-center gap-2">
+        <input
+          #apiKeyInput
+          type="password"
+          placeholder="Gemini API Key"
+          class="grow"
+        />
+        <span class="badge">Hit enter to apply</span>
+      </div>
+    </label>
+  </form>
+  } @if (sentimentsHistory().length) {
+  <h3 class="text-2xl text-center py-4 mt-10 mb-4">History</h3>
+  <section class="rounded-md 0 max-h-[600px] overflow-y-auto relative">
+    <ul class="flex flex-col gap-8">
+      @for (item of sentimentsHistory(); track $index) {
+      <li class="flex flex-col gap-4 bg-base-200 rounded-md pb-4">
+        <h3
+          class="mb-4 p-4 bg-base-100 sticky top-0 text-xl"
+          [ngClass]="{
+            'bg-error text-error-content':
+              item.sentiment.suggested_action === 'block',
+            'bg-success text-success-content':
+              item.sentiment.suggested_action === 'allow'
+          }"
+        >
+          Text: "{{ item.text }}"
+        </h3>
+        <span class="px-4">Gemini's response:</span>
+        <pre class="whitespace-break-spaces text-sm px-4">{{
+          item.sentiment | json
+        }}</pre>
+      </li>
+      }
+    </ul>
+  </section>
   }
 </main>
 <router-outlet></router-outlet>
