@@ -24,7 +24,7 @@ jobs:
           cache: 'npm'
       - run: npm ci --legacy-peer-deps
       - uses: nrwl/nx-set-shas@v4
-      - run: npx nx run-many -t lint test build
+      - run: npx nx affected -t lint test build
   # Deploy job to build and deploy to GitHub Pages
   deploy:
     needs: main

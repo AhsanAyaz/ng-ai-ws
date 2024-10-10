@@ -3,6 +3,7 @@ import { AppComponent } from './app.component';
 import { NxWelcomeComponent } from './nx-welcome.component';
 import { RouterModule } from '@angular/router';
 import { GeminiService } from '@codewithahsan/ng-gc';
+import { provideToastr } from 'ngx-toastr';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -18,6 +19,7 @@ describe('AppComponent', () => {
             };
           },
         },
+        provideToastr(),
       ],
     }).compileComponents();
   });
@@ -27,7 +29,7 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('header nav')?.textContent).toContain(
-      'Angular Gemini Demo App'
+      'Sentiment Analyzer with Google Gemini & Angular'
     );
   });
 });
