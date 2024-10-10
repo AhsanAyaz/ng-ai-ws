@@ -75,6 +75,7 @@
         (input)="typing.set(true)"
       ></textarea>
       <ng-gc-sentiment-analyzer
+        (sentimentUpdated)="addToHistory($event)"
         [model]="form.controls.model.value"
         [text]="inputTextValDebounced()"
         [hideSentiment]="!form.controls.showSentiment.value"

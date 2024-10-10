@@ -4,6 +4,7 @@ import {
   HostBinding,
   inject,
   input,
+  output,
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -26,6 +27,7 @@ export class SentimentAnalyzerComponent {
   sentiment = signal<NGGCSentiment | null>(null);
   loading = signal(false);
   error = signal<Error | null>(null);
+  sentimentUpdated = output<NGGCSentiment | null>();
   @HostBinding('attr.data-sentiment')
   get sentimentAttr() {
     if (this.loading()) {
@@ -40,6 +42,7 @@ export class SentimentAnalyzerComponent {
         if (!textVal) {
           this.loading.set(false);
           this.sentiment.set(null);
+          this.sentimentUpdated.emit(null);
           return;
         }
         this.loading.set(true);
@@ -52,6 +55,7 @@ export class SentimentAnalyzerComponent {
             }
             this.sentiment.set(result);
             this.error.set(null);
+            this.sentimentUpdated.emit(result);
           })
           .catch((err) => {
             console.error(err);

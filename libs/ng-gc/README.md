@@ -51,16 +51,18 @@ import {
   styleUrl: './app.component.scss',
 }) 
 export class AppComponent {
-
+  service = inject(GeminiService); // you can use the service directly
 }
 ```
 
 ```html
 <!-- app.component.html -->
-
+<!-- Or you can use the sentiment analyzer component -->
 <ng-gc-sentiment-analyzer
-  [config]="sentimentConfig()"
-  [text]="inputTextValDebounced()" />
+  model="'gemini-1.5-pro'"
+  [additionalContext]="context"
+  [text]="inputTextValDebounced()"
+  (sentimentUpdated)="doSomethingWithReceivedSentiment($event)"/>
 ```
 
 ## Running unit tests

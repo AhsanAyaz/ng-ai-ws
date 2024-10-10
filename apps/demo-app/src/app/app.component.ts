@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  effect,
   inject,
   signal,
   viewChild,
@@ -53,30 +52,22 @@ export class AppComponent {
 
   sentimentComp = viewChild.required(SentimentAnalyzerComponent);
 
-  watchSentiment = effect(
-    () => {
-      const sentiment = this.sentimentComp().sentiment();
-      const text = this.lastSentimentInput();
-      if (sentiment && text !== this.sentimentsHistory()[0]?.text) {
-        console.log('sentiment: ', sentiment);
-        this.sentimentsHistory.update((history) => {
-          return [
-            {
-              text,
-              sentiment,
-            },
-            ...history,
-          ];
-        });
-        setTimeout(() => {
-          console.log(JSON.stringify(this.sentimentsHistory()));
-        }, 200);
-      }
-    },
-    {
-      allowSignalWrites: true,
+  addToHistory(sentiment: NGGCSentiment | null) {
+    if (!sentiment) {
+      return;
     }
-  );
+    const text = this.lastSentimentInput();
+    console.log('sentiment: ', sentiment);
+    this.sentimentsHistory.update((history) => {
+      return [
+        {
+          text,
+          sentiment,
+        },
+        ...history,
+      ];
+    });
+  }
 
   inputTextValDebounced = toSignal(
     this.form.controls.inputTextVal.valueChanges.pipe(
