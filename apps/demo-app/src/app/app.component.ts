@@ -42,7 +42,7 @@ export class AppComponent {
     showSentiment: [true],
     showMessage: [true],
     additionalContext: [
-      "And I want you to analyze the sentiment of the text written by a user for commenting. We're not going to allow posting comments over intensity of 0.7.",
+      "And I want you to analyze the sentiment of the text written by a user for commenting. We're not going to allow posting comments over 'intensity' of 0.7.",
     ],
   });
   models = NgGCSupportedModels;

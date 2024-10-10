@@ -99,7 +99,7 @@ export class GeminiService {
     });
     const prompt = `
       You are an expert sentiment analyst. ${additionalContext}
-      The intensity can be from 0 to 1. Give an emoji for the particular sentiment & intensity.
+      The 'intensity' can be from 0 to 1. Give an emoji for the particular sentiment & intensity.
       Also include the message to show to the user typing that text
 
       Text:
