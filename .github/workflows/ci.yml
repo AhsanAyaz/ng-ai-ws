@@ -11,8 +11,8 @@ permissions:
   id-token: write
 
 jobs:
-  setup:
-    runs-on: ubuntu-20.04
+  main:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,54 +21,51 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      - name: Cache node modules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
+      - name: Get Date
+        id: get-date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+      - uses: actions/cache/restore@v4
+        id: cache
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ steps.get-date.outputs.date }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - run: npm ci --legacy-peer-deps
-      - uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-
-  main:
-    needs: setup
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-      - run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
+            ${{ runner.os }}-node-${{ steps.get-date.outputs.date }}-
+            ${{ runner.os }}-node-
+      - name: Install Dependencies
+        run: npm ci --legacy-peer-deps
       - uses: nrwl/nx-set-shas@v4
+      - run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
       - run: npx nx affected -t lint test build
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ steps.get-date.outputs.date }}-${{ hashFiles('**/package-lock.json') }}
 
   deploy:
     needs: main
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - uses: actions/cache@v3
+          cache: 'npm'
+      - uses: actions/cache/restore@v4
+        id: cache
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ steps.get-date.outputs.date }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Install Dependencies
+        run: npm ci --legacy-peer-deps
       - name: Build the app
         run: npx nx build demo-app --baseHref "/ng-gc-ws/"
       - name: Setup Pages
@@ -83,24 +80,23 @@ jobs:
 
   e2e:
     needs: [deploy]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - uses: actions/cache@v3
+          cache: 'npm'
+      - uses: actions/cache/restore@v4
+        id: cache
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-      - name: Install Playwright browsers and dependencies
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ steps.get-date.outputs.date }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Install Dependencies
+        run: npm ci --legacy-peer-deps
+      - name: Install Playwright
         run: npx playwright install --with-deps
-      - name: Install additional WebKit dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwoff1 libopus0 libwebp6 libwebpdemux2 libenchant1c2a libgudev-1.0-0 libsecret-1-0 libhyphen0 libgdk-pixbuf2.0-0 libegl1 libnotify4 libxslt1.1 libevent-2.1-7 libgles2 libvpx6 libxcomposite1 libatk1.0-0 libatk-bridge2.0-0 libepoxy0 libgtk-3-0 libharfbuzz-icu0
-          sudo apt-get install -y libgstreamer-gl1.0-0 libgstreamer-plugins-bad1.0-0 gstreamer1.0-plugins-good gstreamer1.0-libav
-      - name: Run e2e tests against deployed app
+      - name: Run e2e tests
         run: CI=true && npx nx e2e demo-app-e2e
