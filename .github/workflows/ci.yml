@@ -24,7 +24,7 @@ jobs:
           cache: 'npm'
       - run: npm ci --legacy-peer-deps
       - uses: nrwl/nx-set-shas@v4
-      - run: npx nx affected -t lint test build
+      - run: npx nx run-many -t lint test build
   # Deploy job to build and deploy to GitHub Pages
   deploy:
     needs: main
@@ -51,7 +51,7 @@ jobs:
         uses: actions/deploy-pages@v4
   # e2e job to run tests against deployed app
   e2e:
-    needs: [deploy]  # Ensures this job runs only after deployment is successful
+    needs: [deploy] # Ensures this job runs only after deployment is successful
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
